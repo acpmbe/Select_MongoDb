@@ -16,7 +16,7 @@ namespace Select_MongoDb
 
             List<BsonDocument> list = new List<BsonDocument>();
             Http_Mod doc;
-            for (int i = 200000; i < 500000; i++)
+            for (int i = 500000; i < 800000; i++)
             {
                 doc = new Http_Mod();
                 doc.LID = i;
@@ -26,7 +26,7 @@ namespace Select_MongoDb
                 doc.DEVID = GetDevice();
                 doc.RESERVE = "00000000";
                 doc.RN = "0000";
-                doc.SPEID = "136";
+                doc.SPEID = GetSpeId();
                 doc.SUBDEVTYPE = GetSubDevType();
                 doc.VERSION = "10";
                 list.Add(doc.ToBsonDocument());

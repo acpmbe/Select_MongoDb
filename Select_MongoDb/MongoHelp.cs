@@ -8,7 +8,9 @@ using MongoDB.Driver;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Bson.IO;
-
+using System.Threading;
+using MongoDB.Driver.Linq;
+using MongoDB.Bson.Serialization.Attributes;
 namespace Select_MongoDb
 {
 
@@ -28,7 +30,7 @@ namespace Select_MongoDb
     public class MongoHelp
     {
 
-        public static MongoClient Client;
+        private static MongoClient Client;
         private static IMongoDatabase Database;
 
         private static string MongoDbConnStr;
@@ -51,13 +53,7 @@ namespace Select_MongoDb
                     MongoDbConnStr = mongoDbConnStr;
                     DatabaseName = databaseName;
                     Client = new MongoClient(mongoDbConnStr);
-
-
-       
-
-
                     Database = Client.GetDatabase(databaseName);
-
                     return "0";
                
                 }
@@ -355,7 +351,7 @@ namespace Select_MongoDb
         /// <summary>
         /// 状态。
         /// </summary>
-       public static void Stat()
+       public static void Status()
         {
             //config = MongoServerSettings.FromUrl(MongoUrl.Create(conStr));
             ////最大连接池
@@ -405,17 +401,99 @@ namespace Select_MongoDb
         /// <param name="bson">BsonDocument查询对象</param>
         /// <param name="sort">BsonDocument排序对象</param>
         /// <returns></returns>
-        public static List<BsonDocument> SelectSort(string collectionName, BsonDocument bson,BsonDocument sort)
+        public static List<BsonDocument> SelectSort(string collectionName, BsonDocument bson, BsonDocument sort)
         {
-           
+
 
             List<BsonDocument> list = new List<BsonDocument>();
             var collection = GetCollection(collectionName);
-            collection.Find(bson).Sort(sort).ForEachAsync(x => list.Add(x)).Wait();
+            //   collection.Find(bson).Sort(sort).ForEachAsync(x => list.Add(x)).Wait();
+
+            //   collection.Find(bson).ForEachAsync(x => list.Add(x)).Wait();
+
+
+            //  db.test.find({ xxx...xxx}).sort({ "amount":1}).skip(10).limit(10)//这里忽略掉查询语句
+
+              list = collection.Find(bson).Sort(sort).Skip(100000).Limit(500).ToList();
+
+         
+    
+
+
+
+
+
+            //var query = Query<Http_Mod>.GT(item => item., 2399927);
+            //var result = collection.Find(query).SetLimit(100)
+            //                       .SetSortOrder(SortBy.Ascending("amount")).ToList();
+            //Console.WriteLine(result.First().ToJson());//BSON自带的ToJson
+
+
+
+          //  list = collection.Find(bson).Sort(sort).Limit(500).ToList();
+
+
+          //  db.test.find({ amount: {$gt: 2399927} }).sort({ "amount":1}).limit(10)  //53ms
+
+
+
+
+
+
+
+
+
+
             return list;
 
 
-         
+
+
+
+        }
+
+        public static void RR(string collectionName)
+        {
+            IMongoCollection<BsonDocument> collection= Database.GetCollection<BsonDocument>(collectionName);
+
+
+        
+
+       
+
+            //  BsonDocument sddd;
+
+          
+
+
+            //
+            // 摘要:
+            //     Begins a fluent find interface.
+            //
+            // 参数:
+            //   collection:
+            //     The collection.
+            //
+            //   filter:
+            //     The filter.
+            //
+            //   options:
+            //     The options.
+            //
+            // 类型参数:
+            //   TDocument:
+            //     The type of the document.
+            //
+            // 返回结果:
+            //     A fluent find interface.
+            //public static IFindFluent<TDocument, TDocument> Find<TDocument>(this IMongoCollection<TDocument> collection, FilterDefinition<TDocument> filter, FindOptions options = null);
+
+
+
+            // collection.Find
+
+            //  var vdd = collection.Find<BsonDocument>(bson).Sort(sort);
+
         }
 
 
@@ -431,8 +509,60 @@ namespace Select_MongoDb
 
 
 
+       
+
     }
 
+    //  TDocument
+
+    public class Test
+    {
+        /// <summary>
+        /// 主键 ObjectId 是MongoDB自带的主键类型
+        /// </summary>
+        public ObjectId Id { get; set; }
+        /// <summary>
+        /// 客户编号
+        /// </summary>
+        [MongoDB.Bson.Serialization.Attributes.BsonElement("cust_id")]
+        public string CustomerId { get; set; }
+        /// <summary>
+        /// 总数
+        /// </summary>
+        [BsonElement("amount")]
+        public int Amount { get; set; }
+        /// <summary>
+        /// 状态
+        /// </summary>
+        [BsonElement("status")]
+        public string Status { get; set; }
+    }
+
+    public class TDocument : FilterDefinition<SDocument>
+    {
+        public override BsonDocument Render(IBsonSerializer<SDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
+        {
+         
+           
+            throw new NotImplementedException();
+        }
+    }
+    public class SDocument
+    {
+
+        public Int64 LID { get; set; }
+
+     
+        public DateTime CREATED { get; set; }
+        public string RN { get; set; }
+        public Int32 DEVID { get; set; }
+        public string RESERVE { get; set; }
+        public string SUBDEVTYPE { get; set; }
+        public string SPEID { get; set; }
+        public string VERSION { get; set; }
+        public string CMDID { get; set; }
+        public string COMTENT { get; set; }
+    }
 
 
 

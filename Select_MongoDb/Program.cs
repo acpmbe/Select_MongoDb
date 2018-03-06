@@ -29,21 +29,12 @@ namespace Select_MongoDb
                     return;
                 }
 
-
+                //Insert();
                 //MongoHelp.Client.Settings.MaxConnectionPoolSize = 1000;
                 //MongoHelp.Client.Settings.MinConnectionPoolSize = 100;
-
                 //MongoHelp.Client.Settings.WaitQueueSize = 1000;
-
                 //MongoHelp.Client.Settings.WaitQueueTimeout = TimeSpan.FromSeconds(1000);
 
-
-
-
-                MongoHelp.Stat();
-
-              //  Insert();
-        
                 Console.WriteLine("连接数据库成功！");
                 while (true)
                 {
@@ -52,7 +43,7 @@ namespace Select_MongoDb
                     switch (array[0])
                     {
                         case "HELP":
-                            Console.WriteLine("SPEID,TIME,CMDID,SUBDEVTYPE,COMTENT,EXIT");
+                            Console.WriteLine("SPEID,TIME,CMDID,SUBDEVTYPE,COMTENT,COUNT,EXIT");
                             break;
                         case "SPEID":
                             FindSpeId(array[1]);
@@ -69,13 +60,19 @@ namespace Select_MongoDb
                         case "COMTENT":
                             FindContent(array[1]);
                             break;
+                        case "COUNT":
+                            Count();
+                            break;
+                        case "STATUS":
+                            Status();
+                            break;
                         case "EXIT":
                             Console.WriteLine("已退出程序。");
                             return;
 
                     }
 
-                    MongoHelp.Stat();
+                    
                 }
             }
             catch(Exception ex)
@@ -88,6 +85,17 @@ namespace Select_MongoDb
 
 
       
+        }
+
+        static void Count()
+        {
+            long count = MongoHelp.Count(CollectionName);
+            Console.WriteLine(count);
+        }
+
+        static void Status()
+        {
+            MongoHelp.Status();
         }
 
         static void FindSpeId(string speid)
